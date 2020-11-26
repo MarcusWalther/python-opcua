@@ -506,6 +506,7 @@ class AddressSpace(object):
         self._handle_to_attribute_map = {}
         self._default_idx = 2
         self._nodeid_counter = {0: 20000, 1: 2000}
+        self.updateTimestamps = False
 
     def __getitem__(self, nodeid):
         with self._lock:
@@ -674,6 +675,9 @@ class AddressSpace(object):
             attval.value = value
             cbs = []
             if old.Value != value.Value:  # only send call callback when a value change has happend
+                if self.updateTimestamps:
+                    attval.value.ServerTimestamp = datetime.utcnow()
+                    attval.value.SourceTimestamp = datetime.utcnow()
                 cbs = list(attval.datachange_callbacks.items())
 
         for k, v in cbs:
